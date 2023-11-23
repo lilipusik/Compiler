@@ -10,7 +10,7 @@ namespace Compiler.Tokens
 	{
 		string lexeme;
 
-		public Identifier(string lexeme) : base(type, position)
+		public Identifier(string lexeme, Position position) : base(type, position)
 		{
 			this.lexeme = lexeme;
 			type = Token_type.IDENTIFIER;

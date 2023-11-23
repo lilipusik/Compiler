@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analyzers\Lexer.cs" />
+    <Compile Include="Analyzers\Sytaxer.cs" />
+    <Compile Include="Error.cs" />
     <Compile Include="File_Work.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Program.cs" />

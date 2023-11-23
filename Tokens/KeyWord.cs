@@ -6,19 +6,77 @@ using System.Threading.Tasks;
 
 namespace Compiler.Tokens
 {
+	enum KeyWords { 
+		PROGRAM, BEGIN, END, VAR, IF, ELSE, THEN, WHILE, FOR, DO, TO,				// keywords
+		LESS, GREATER, LESS_EQUAL, GREATER_EQUAL, EQUAL, NOT_EQUAL, AND, OR, NOT,   // conditions
+		ASSIGN, PLUS, MINUS, MULTI, DIV, MOD,								// math operations
+		LPAR, RPAR /* () */, LBRA, RBRA /* {} */, LSQR, RSQR /* [] */,				// brackets
+		SEMICOLON /* ; */, COLON /* : */, COMMA /* , */, POINT /* . */				// other operators
+	};
+
 	class KeyWord : Token
 	{
-		string lexeme;
+		KeyWords keyword;
 
-		public KeyWord(string lexeme) : base(type, position)
+		public KeyWord(KeyWords key, Position position) : base(type, position)
 		{
-			this.lexeme = lexeme;
+			this.keyword = key;
 			type = Token_type.KEYWORD;
 		}
 
 		public override string ToString()
 		{
 			return $"token: {type}";
+		}
+
+		private static Dictionary<string, KeyWords> keywords = new Dictionary<string, KeyWords>
+		{
+			{ "program", KeyWords.PROGRAM },
+			{ "begin", KeyWords.BEGIN },
+			{ "end", KeyWords.END },
+			{ "var", KeyWords.VAR },
+			{ "if", KeyWords.IF },
+			{ "else", KeyWords.ELSE },
+			{ "then", KeyWords.THEN },
+			{ "while", KeyWords.WHILE },
+			{ "for", KeyWords.FOR },
+			{ "do", KeyWords.DO },
+			{ "to", KeyWords.TO },
+			{ "<", KeyWords.LESS },
+			{ ">", KeyWords.GREATER },
+			{ "<=", KeyWords.LESS_EQUAL },
+			{ ">=", KeyWords.GREATER_EQUAL },
+			{ "=" , KeyWords.EQUAL },
+			{ "<>" , KeyWords.NOT_EQUAL },
+			{ "and", KeyWords.AND },
+			{ "or" , KeyWords.OR },
+			{ "not", KeyWords.NOT },
+			{ ":=", KeyWords.ASSIGN },
+			{ "+", KeyWords.PLUS },
+			{ "-", KeyWords.MINUS },
+			{ "*", KeyWords.MULTI },
+			{ "div", KeyWords.DIV },
+			{ "mod", KeyWords.MOD },
+			{ "(", KeyWords.LPAR },
+			{ ")", KeyWords.RPAR },
+			{ "{", KeyWords.LBRA },
+			{ "}", KeyWords.RBRA },
+			{ "[", KeyWords.LSQR },
+			{ "]", KeyWords.RSQR },
+			{ ";", KeyWords.SEMICOLON },
+			{ ":", KeyWords.COLON },
+			{ ",", KeyWords.COMMA },
+			{ ".", KeyWords.POINT }
+		};
+
+		public static bool Is_KeyWord(string lexeme)
+		{
+			return keywords.ContainsKey(lexeme);
+		}
+
+		public static KeyWords Get_KeyWord(string lexeme)
+		{
+			return keywords[lexeme];
 		}
 	}
 }
