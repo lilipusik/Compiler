@@ -19,6 +19,11 @@ namespace Compiler.Tokens
 			position = new Position(pos.Get_Position().Item1, pos.Get_Position().Item2);
 		}
 
+		public Token_type Get_Type()
+		{
+			return type;
+		}
+
 		public override string ToString()
 		{
 			return $"token: {type}";

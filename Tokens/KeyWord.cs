@@ -9,9 +9,10 @@ namespace Compiler.Tokens
 	enum KeyWords { 
 		PROGRAM, BEGIN, END, VAR, IF, ELSE, THEN, WHILE, FOR, DO, TO,				// keywords
 		LESS, GREATER, LESS_EQUAL, GREATER_EQUAL, EQUAL, NOT_EQUAL, AND, OR, NOT,   // conditions
-		ASSIGN, PLUS, MINUS, MULTI, DIV, MOD,								// math operations
+		ASSIGN, PLUS, MINUS, MULTI, DIV, MOD,										// math operations
 		LPAR, RPAR /* () */, LBRA, RBRA /* {} */, LSQR, RSQR /* [] */,				// brackets
-		SEMICOLON /* ; */, COLON /* : */, COMMA /* , */, POINT /* . */				// other operators
+		SEMICOLON /* ; */, COLON /* : */, COMMA /* , */, POINT /* . */,				// other operators
+		CONST, INTEGER, FLOAT, STRING, BOOLEAN										// types
 	};
 
 	class KeyWord : Token
@@ -66,8 +67,18 @@ namespace Compiler.Tokens
 			{ ";", KeyWords.SEMICOLON },
 			{ ":", KeyWords.COLON },
 			{ ",", KeyWords.COMMA },
-			{ ".", KeyWords.POINT }
+			{ ".", KeyWords.POINT },
+			{ "const", KeyWords.CONST },
+			{ "float", KeyWords.FLOAT },
+			{ "integer", KeyWords.INTEGER },
+			{ "string", KeyWords.STRING },
+			{ "boolean", KeyWords.BOOLEAN }
 		};
+
+		public KeyWords Get_Type_KeyWord()
+		{
+			return keyword;
+		}
 
 		public static bool Is_KeyWord(string lexeme)
 		{

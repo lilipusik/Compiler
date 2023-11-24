@@ -20,6 +20,11 @@ namespace Compiler.Tokens
 			type = Token_type.CONST;
 		}
 
+		public Const_type Get_Const_Type()
+		{
+			return const_type;
+		}
+
 		public override string ToString()
 		{
 			return $"token: {type} ({const_type})";

@@ -1,6 +1,7 @@
 ﻿using Compiler.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,13 +11,14 @@ namespace Compiler.Analyzers
 	internal class Lexer
 	{
 		string lexeme;
-		Token_type token;
 		Position position;
+		StreamWriter writer;
 
-		public Lexer(string lexeme, Position position)
+		public Lexer(string lexeme, Position position, StreamWriter writer)
 		{
 			this.lexeme = lexeme;
 			this.position = position;
+			this.writer = writer;
 		}
 
 		private bool Is_Identifier()
@@ -25,16 +27,16 @@ namespace Compiler.Analyzers
 				&& !(lexeme[0] >= 48 && lexeme[0] <= 57);
 		}
 
-		private bool Is_Constant(ref Const_type type)
+		public bool Is_Constant(ref Const_type type)
 		{
-			if (lexeme == "True" || lexeme == "False" || lexeme == "true" || lexeme == "false")
-			{
-				type = Const_type.BOOLEAN; return true;
-			}
-
 			if (lexeme.StartsWith("\"") && lexeme.EndsWith("\""))
 			{
 				type = Const_type.STRING; return true;
+			}
+
+			if (lexeme == "True" || lexeme == "False" || lexeme == "true" || lexeme == "false")
+			{
+				type = Const_type.BOOLEAN; return true;
 			}
 
 			if (lexeme.All(x => char.IsDigit(x)))
@@ -59,7 +61,7 @@ namespace Compiler.Analyzers
 
 			if (Is_Identifier()) return new Identifier(lexeme, position);
 			
-			Console.WriteLine(new Error("Unrecoghized characters", position, lexeme));
+			writer.WriteLine(new Error("Unrecoghized characters", position, lexeme));
 			return new Unknown(lexeme, position);
 		}
 	}

@@ -10,14 +10,9 @@ namespace Compiler
 	internal class File_Work
 	{
 		string cur_line;
-		char cur_symbol;
 		Position cur_position;
-		List<char> separate_symbols = new List<char> { '<', '>', '=', ':', '+', '-', '*', '(', ')', '{', '}', '[', ']', ';', ':', ',', '.', ' '};
-
-		public Position Get_Position()
-		{
-			return cur_position;
-		}
+		List<char> separate_symbols = new List<char> { '<', '>', '=', ':', '+', '-', '*', '(', ')', '{', '}', '[', ']', ';', ':', ',', '.', ' ', '/', '"'};
+		List<char> double_symbols = new List<char> { '<', '>', '=', ':' };
 
 		public File_Work(string line)
 		{
@@ -25,21 +20,54 @@ namespace Compiler
 			cur_position = new Position();
 		}
 
-		private char Next_Symbol()
-		{
-			cur_symbol = cur_line[cur_position.Get_Position().Item2];
-			cur_position = new Position(cur_position.Get_Position().Item1, cur_position.Get_Position().Item2 + 1);
-			return cur_symbol;
-		}
+		public Position Get_Position() { return cur_position; }
 
-		public string Get_Lexeme()
+		public string Get_Lexeme(Position position)
 		{
+			bool flag_string = false;
 			string lexeme = string.Empty;
-			while (!separate_symbols.Contains(cur_symbol) && cur_position.Get_Position().Item2 < cur_line.Length) 
+			for (int i = position.Get_Position().Item2; i < cur_line.Length; i++)
 			{
-				lexeme += Next_Symbol();
-			};
-			return lexeme;
+				cur_position = new Position(cur_position.Get_Position().Item1, cur_position.Get_Position().Item2 + 1);
+
+				if (!separate_symbols.Contains(cur_line[i]) || (flag_string && cur_line[i] != '"')) lexeme += cur_line[i];
+				else
+				{
+					// token type => string
+					if (!flag_string && cur_line[i] == '"')
+					{
+						flag_string = true;
+						lexeme += cur_line[i];
+						continue;
+					}
+					if (flag_string && cur_line[i] == '"')
+					{
+						lexeme += cur_line[i];
+						return lexeme;
+					}
+
+					// some lexeme
+					if (lexeme.Length > 0)
+					{
+						cur_position = new Position(cur_position.Get_Position().Item1, cur_position.Get_Position().Item2 - 1);
+						return lexeme;
+					}
+
+					// move to next lexeme
+					if (cur_line[i] == ' ') break;
+
+					// lexeme from double operator
+					if (i + 1 < cur_line.Length && double_symbols.Contains(cur_line[i]) && double_symbols.Contains(cur_line[i + 1]))
+					{
+						cur_position = new Position(cur_position.Get_Position().Item1, cur_position.Get_Position().Item2 + 1);
+						return cur_line[i].ToString() + cur_line[i + 1].ToString();
+					}
+
+					// single character lexeme
+					return cur_line[i].ToString();
+				}
+			}
+			return lexeme; // some lexeme
 		}
 
 	}
