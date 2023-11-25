@@ -11,13 +11,13 @@ namespace Compiler
 	{
 		string cur_line;
 		Position cur_position;
-		List<char> separate_symbols = new List<char> { '<', '>', '=', ':', '+', '-', '*', '(', ')', '{', '}', '[', ']', ';', ':', ',', '.', ' ', '/', '"'};
+		List<char> separate_symbols = new List<char> { '<', '>', '=', ':', '+', '-', '*', '(', ')', '{', '}', '[', ']', ';', ':', ',', '.', ' ', '/', '"', '\t'};
 		List<char> double_symbols = new List<char> { '<', '>', '=', ':' };
 
-		public File_Work(string line)
+		public File_Work(string line, Position position)
 		{
-			cur_line = line;
-			cur_position = new Position();
+			this.cur_line = line;
+			this.cur_position = new Position(position.Get_Position().Item1, 0);
 		}
 
 		public Position Get_Position() { return cur_position; }
@@ -54,7 +54,7 @@ namespace Compiler
 					}
 
 					// move to next lexeme
-					if (cur_line[i] == ' ') break;
+					if (cur_line[i] == ' ' || cur_line[i] == '\t') break;
 
 					// lexeme from double operator
 					if (i + 1 < cur_line.Length && double_symbols.Contains(cur_line[i]) && double_symbols.Contains(cur_line[i + 1]))

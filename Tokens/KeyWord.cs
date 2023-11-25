@@ -27,7 +27,7 @@ namespace Compiler.Tokens
 
 		public override string ToString()
 		{
-			return $"token: {type}";
+			return $"token: {type} ({keyword})";
 		}
 
 		private static Dictionary<string, KeyWords> keywords = new Dictionary<string, KeyWords>

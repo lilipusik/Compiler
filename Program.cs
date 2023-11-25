@@ -13,24 +13,17 @@ namespace Compiler
 	{
 		static void Main(string[] args)
 		{
-			// clear older result
-			using (StreamWriter writer = new StreamWriter("Compiler_Work.txt"))
+			using (StreamReader sr = new StreamReader("Pascal_code.txt")) // reading pascal code
 			{
-				writer.Write("");
-			}
-
-			// start program
-			using (StreamReader sr = new StreamReader("Pascal_code.txt"))
-			{
-				string line;
+				string line; int i = 0;
 				Position position = new Position();
 
-				while ((line = sr.ReadLine()) != null)
+				using (StreamWriter sw = new StreamWriter("Compiler_Work.txt")) // writing result compiler work
 				{
-					File_Work file = new File_Work(line);
-
-					using (StreamWriter sw = new StreamWriter("Compiler_Work.txt", true))
+					while ((line = sr.ReadLine()) != null)
 					{
+						File_Work file = new File_Work(line, position);
+
 						Position pos = new Position();
 						List<Tuple<string, Token>> float_token = new List<Tuple<string, Token>>();
 						string string_token = string.Empty;
@@ -38,8 +31,11 @@ namespace Compiler
 						{
 							// find lexeme and position
 							string lexeme = file.Get_Lexeme(position);
-							position = file.Get_Position();
-							if (lexeme == string.Empty) continue;
+							if (lexeme == string.Empty)
+							{
+								position = file.Get_Position();
+								continue;
+							}
 
 							// find token
 							Lexer lexer = new Lexer(lexeme, position, sw);
@@ -66,11 +62,13 @@ namespace Compiler
 								token = new Lexer(lexeme, pos, sw).Get_Token();
 							}
 
-							sw.WriteLine("lexeme: " + lexeme + "\n" + token + "\n");
+							position = new Position(i, file.Get_Position().Get_Position().Item2);
+							Console.WriteLine(position);
+							sw.WriteLine("lexeme: " + lexeme + " -> " + token + " -> " + position);
 
 						} while (position.Get_Position().Item2 < line.Length);
+						i++;
 					}
-					position = new Position(position.Get_Position().Item1 + 1, 0);
 				}
 			}
 		}
