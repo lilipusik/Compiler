@@ -64,7 +64,7 @@ namespace Compiler
 
 							position = new Position(i, file.Get_Position().Get_Position().Item2);
 							Console.WriteLine(position);
-							sw.WriteLine("lexeme: " + lexeme + " -> " + token + " -> " + position);
+							sw.WriteLine("lexeme: " + lexeme + "\n" + token + " -> " + position + "\n");
 
 						} while (position.Get_Position().Item2 < line.Length);
 						i++;

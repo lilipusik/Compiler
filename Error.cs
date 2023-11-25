@@ -21,7 +21,7 @@ namespace Compiler
 
 		public override string ToString()
 		{
-			return $"Error: {message} -> {position} -> {lexeme}";
+			return $"\n!!! Error: {message} -> {position} -> {lexeme}";
 		}
 	}
 }

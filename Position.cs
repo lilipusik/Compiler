@@ -34,7 +34,7 @@ namespace Compiler
 
 		public override string ToString()
 		{
-			return $"({line + 1}, {symbol + 1})\n";
+			return $"({line + 1}, {symbol + 1})";
 		}
 	}
 }
