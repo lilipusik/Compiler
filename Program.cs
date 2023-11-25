@@ -30,7 +30,7 @@ namespace Compiler
 						string string_token = string.Empty;
 						do
 						{
-							// find lexeme and position
+							// find lexeme
 							string lexeme = file.Get_Lexeme(position);
 							if (lexeme == string.Empty)
 							{
@@ -42,8 +42,11 @@ namespace Compiler
 							Lexer lexer = new Lexer(lexeme, position, sw);
 							Token token = lexer.Get_Token();
 
-							position = new Position(i, file.Get_Position().Get_Position().Item2);
+							// writing new lexeme and token
 							sw.WriteLine("lexeme: " + lexeme + "\n" + token + " -> " + position + "\n");
+
+							// find next position
+							position = new Position(i, file.Get_Position().Get_Position().Item2);
 
 						} while (position.Get_Position().Item2 < line.Length);
 						i++;
