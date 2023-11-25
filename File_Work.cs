@@ -33,6 +33,13 @@ namespace Compiler
 				if (!separate_symbols.Contains(cur_line[i]) || (flag_string && cur_line[i] != '"')) lexeme += cur_line[i];
 				else
 				{
+					// token type => float
+					if (cur_line[i] == '.' && int.TryParse(lexeme, out _))
+					{
+						lexeme += cur_line[i];
+						continue;
+					}
+
 					// token type => string
 					if (!flag_string && cur_line[i] == '"')
 					{
@@ -50,6 +57,8 @@ namespace Compiler
 					if (lexeme.Length > 0)
 					{
 						cur_position = new Position(cur_position.Get_Position().Item1, cur_position.Get_Position().Item2 - 1);
+						if (Char.IsDigit(lexeme[0]) && Char.IsDigit(lexeme[lexeme.Length - 1]) && lexeme.Contains('.'))
+							lexeme = lexeme.Replace('.', ',');
 						return lexeme;
 					}
 

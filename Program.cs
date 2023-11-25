@@ -23,6 +23,7 @@ namespace Compiler
 					while ((line = sr.ReadLine()) != null)
 					{
 						File_Work file = new File_Work(line, position);
+						position = new Position(i, file.Get_Position().Get_Position().Item2);
 
 						Position pos = new Position();
 						List<Tuple<string, Token>> float_token = new List<Tuple<string, Token>>();
@@ -33,7 +34,7 @@ namespace Compiler
 							string lexeme = file.Get_Lexeme(position);
 							if (lexeme == string.Empty)
 							{
-								position = file.Get_Position();
+								position = new Position(i, file.Get_Position().Get_Position().Item2);
 								continue;
 							}
 
@@ -41,29 +42,7 @@ namespace Compiler
 							Lexer lexer = new Lexer(lexeme, position, sw);
 							Token token = lexer.Get_Token();
 
-							// maybe token is float
-							if (float_token.Count == 0 && token is Constant c && c.Get_Const_Type() == Const_type.INTEGER)
-							{
-								pos = new Position(position.Get_Position().Item1, position.Get_Position().Item2);
-								float_token.Add(new Tuple<string, Token>(lexeme, token));
-								continue;
-							}
-							else if (float_token.Count == 1 && token is KeyWord k && k.Get_Type_KeyWord() == KeyWords.POINT)
-							{
-								float_token.Add(new Tuple<string, Token>(lexeme, token));
-								continue;
-							}
-							else if (float_token.Count == 2 && token is Constant co && co.Get_Const_Type() == Const_type.INTEGER)
-							{
-								float_token.Add(new Tuple<string, Token>(lexeme, token));
-								lexeme = string.Empty;
-								foreach (var tuple in float_token)
-									lexeme += tuple.Item1.Replace('.', ',');
-								token = new Lexer(lexeme, pos, sw).Get_Token();
-							}
-
 							position = new Position(i, file.Get_Position().Get_Position().Item2);
-							Console.WriteLine(position);
 							sw.WriteLine("lexeme: " + lexeme + "\n" + token + " -> " + position + "\n");
 
 						} while (position.Get_Position().Item2 < line.Length);
