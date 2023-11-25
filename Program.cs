@@ -23,18 +23,14 @@ namespace Compiler
 					while ((line = sr.ReadLine()) != null)
 					{
 						File_Work file = new File_Work(line, position);
-						position = new Position(i, file.Get_Position().Get_Position().Item2);
 
-						Position pos = new Position();
-						List<Tuple<string, Token>> float_token = new List<Tuple<string, Token>>();
-						string string_token = string.Empty;
 						do
 						{
 							// find lexeme
 							string lexeme = file.Get_Lexeme(position);
 							if (lexeme == string.Empty)
 							{
-								position = new Position(i, file.Get_Position().Get_Position().Item2);
+								position = new Position(position.Get_Position().Item1, file.Get_Position().Get_Position().Item2);
 								continue;
 							}
 
@@ -46,10 +42,11 @@ namespace Compiler
 							sw.WriteLine("lexeme: " + lexeme + "\n" + token + " -> " + position + "\n");
 
 							// find next position
-							position = new Position(i, file.Get_Position().Get_Position().Item2);
+							position = new Position(position.Get_Position().Item1, file.Get_Position().Get_Position().Item2);
 
 						} while (position.Get_Position().Item2 < line.Length);
-						i++;
+
+						position = new Position(position.Get_Position().Item1 + 1);
 					}
 				}
 			}
