@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Compiler
 {
-	internal class File_Work
+	class File_Work
 	{
 		string cur_line;
 		Position cur_position;
@@ -20,7 +20,7 @@ namespace Compiler
 			this.cur_position = new Position(position.Get_Position().Item1, 0);
 		}
 
-		public Position Get_Position() { return cur_position; }
+		public Tuple<int,int> Get_Position() { return cur_position.Get_Position(); }
 
 		public string Get_Lexeme(Position position)
 		{
@@ -57,7 +57,7 @@ namespace Compiler
 					if (lexeme.Length > 0)
 					{
 						cur_position = new Position(cur_position.Get_Position().Item1, cur_position.Get_Position().Item2 - 1);
-						if (Char.IsDigit(lexeme[0]) && Char.IsDigit(lexeme[lexeme.Length - 1]) && lexeme.Contains('.'))
+						if (Char.IsDigit(lexeme[0]) && Char.IsDigit(lexeme[lexeme.Length - 1]) && lexeme.Contains('.')) // float
 							lexeme = lexeme.Replace('.', ',');
 						return lexeme;
 					}

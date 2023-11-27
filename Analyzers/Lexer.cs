@@ -1,5 +1,4 @@
-﻿using Compiler.Tokens;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,6 +19,10 @@ namespace Compiler.Analyzers
 			this.position = position;
 			this.writer = writer;
 		}
+
+		public string Lexeme() { return lexeme; }
+		public Position Position() { return position; }
+		public StreamWriter StreamWriter() { return writer; }
 
 		private bool Is_Identifier()
 		{
@@ -60,8 +63,8 @@ namespace Compiler.Analyzers
 			if (Is_Constant(ref const_Type)) return new Constant(const_Type, lexeme, position);
 
 			if (Is_Identifier()) return new Identifier(lexeme, position);
-			
-			writer.WriteLine(new Error("Unrecoghized characters", position, lexeme));
+
+			writer.WriteLine(new Error("Unrecoghized characters", position, lexeme, "Syntax error"));
 			return new Unknown(lexeme, position);
 		}
 	}

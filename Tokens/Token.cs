@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Compiler.Tokens
+namespace Compiler
 {
 	enum Token_type { IDENTIFIER, CONST, KEYWORD, UNKNOWN };
 

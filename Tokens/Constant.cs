@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Compiler.Tokens
+namespace Compiler
 {
 	enum Const_type { STRING, INTEGER, BOOLEAN, FLOAT };
 

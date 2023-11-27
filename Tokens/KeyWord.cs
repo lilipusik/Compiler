@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Compiler.Tokens
+namespace Compiler
 {
 	enum KeyWords { 
 		PROGRAM, BEGIN, END, VAR, IF, ELSE, THEN, WHILE, FOR, DO, TO,				// keywords
