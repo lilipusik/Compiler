@@ -42,12 +42,13 @@ namespace Compiler
 
 		private void Print_LexemeToken()
 		{
-			writer.WriteLine("lexeme: " + lexeme + "\n" + token + " -> " + position + "\n");
+			writer.WriteLine("lexeme: " + lexeme + "\n" + token + " -> " + 
+				new Position(position.Get_Position().Item1, position.Get_Position().Item2 - lexeme.Length) + "\n");
 		}
 
 		public void Next_Token()
 		{
-			position = new Position(file.Get_Position().Item1, file.Get_Position().Item2);
+			//position = new Position(file.Get_Position().Item1, file.Get_Position().Item2);
 
 			file = new File_Work(reader, position, file.Get_Line());
 			lexer = new Lexer(file);
@@ -70,6 +71,7 @@ namespace Compiler
 
 			token = lexer.Get_Token();
 
+			position = new Position(file.Get_Position().Item1, file.Get_Position().Item2);
 			Print_LexemeToken();
 		}
 
