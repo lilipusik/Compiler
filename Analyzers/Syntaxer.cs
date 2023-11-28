@@ -48,8 +48,6 @@ namespace Compiler
 
 		public void Next_Token()
 		{
-			//position = new Position(file.Get_Position().Item1, file.Get_Position().Item2);
-
 			file = new File_Work(reader, position, file.Get_Line());
 			lexer = new Lexer(file);
 			New_Token();
