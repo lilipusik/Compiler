@@ -11,18 +11,17 @@ namespace Compiler.Analyzers
 	{
 		string lexeme;
 		Position position;
-		StreamWriter writer;
 
-		public Lexer(string lexeme, Position position, StreamWriter writer)
+		public Lexer(File_Work file)
 		{
-			this.lexeme = lexeme;
-			this.position = position;
-			this.writer = writer;
+			this.position = new Position(file.Get_Position().Item1, file.Get_Position().Item2);
+			this.lexeme = file.Get_Lexeme();
 		}
 
-		public string Lexeme() { return lexeme; }
-		public Position Position() { return position; }
-		public StreamWriter StreamWriter() { return writer; }
+		public string Get_Lexeme()
+		{
+			return lexeme;
+		}
 
 		private bool Is_Identifier()
 		{
@@ -64,7 +63,7 @@ namespace Compiler.Analyzers
 
 			if (Is_Identifier()) return new Identifier(lexeme, position);
 
-			writer.WriteLine(new Error("Unrecoghized characters", position, lexeme, "Syntax error"));
+			//writer.WriteLine(new Error("Unrecoghized characters", position, lexeme, "Syntax error"));
 			return new Unknown(lexeme, position);
 		}
 	}

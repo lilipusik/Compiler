@@ -9,24 +9,46 @@ namespace Compiler
 {
 	class File_Work
 	{
+		StreamReader reader;
 		string cur_line;
 		Position cur_position;
 		List<char> separate_symbols = new List<char> { '<', '>', '=', ':', '+', '-', '*', '(', ')', '{', '}', '[', ']', ';', ':', ',', '.', ' ', '/', '"', '\t'};
 		List<char> double_symbols = new List<char> { '<', '>', '=', ':' };
 
-		public File_Work(string line, Position position)
+		public File_Work(StreamReader reader)
 		{
-			this.cur_line = line;
-			this.cur_position = new Position(position.Get_Position().Item1, 0);
+			this.reader = reader;
+			cur_position = new Position();
+			cur_line = reader.ReadLine();
 		}
+
+		public File_Work(StreamReader reader, Position position, string line)
+		{
+			this.reader = reader;
+			this.cur_position = position;
+			this.cur_line = line;
+		}
+
+		public StreamReader Get_StreamReader() { return reader; }
+		
+		public string Get_Line() { return cur_line; }
 
 		public Tuple<int,int> Get_Position() { return cur_position.Get_Position(); }
 
-		public string Get_Lexeme(Position position)
+		public void New_Line()
 		{
+			cur_line = reader.ReadLine();
+			cur_position = new Position(cur_position.Get_Position().Item1 + 1);
+		}
+
+		public string Get_Lexeme()
+		{
+			if (cur_position.Get_Position().Item2 >= cur_line.Length) New_Line();
+
 			bool flag_string = false;
 			string lexeme = string.Empty;
-			for (int i = position.Get_Position().Item2; i < cur_line.Length; i++)
+
+			for (int i = cur_position.Get_Position().Item2; i < cur_line.Length; i++)
 			{
 				cur_position = new Position(cur_position.Get_Position().Item1, cur_position.Get_Position().Item2 + 1);
 
@@ -50,7 +72,8 @@ namespace Compiler
 					if (flag_string && cur_line[i] == '"')
 					{
 						lexeme += cur_line[i];
-						return lexeme;
+						if (lexeme == string.Empty) Get_Lexeme();
+						else return lexeme;
 					}
 
 					// some lexeme
@@ -59,7 +82,8 @@ namespace Compiler
 						cur_position = new Position(cur_position.Get_Position().Item1, cur_position.Get_Position().Item2 - 1);
 						if (Char.IsDigit(lexeme[0]) && Char.IsDigit(lexeme[lexeme.Length - 1]) && lexeme.Contains('.')) // float
 							lexeme = lexeme.Replace('.', ',');
-						return lexeme;
+						if (lexeme == string.Empty) Get_Lexeme();
+						else return lexeme;
 					}
 
 					// move to next lexeme
@@ -69,15 +93,19 @@ namespace Compiler
 					if (i + 1 < cur_line.Length && double_symbols.Contains(cur_line[i]) && double_symbols.Contains(cur_line[i + 1]))
 					{
 						cur_position = new Position(cur_position.Get_Position().Item1, cur_position.Get_Position().Item2 + 1);
-						return cur_line[i].ToString() + cur_line[i + 1].ToString();
+						lexeme = cur_line[i].ToString() + cur_line[i + 1].ToString();
+						if (lexeme == string.Empty) Get_Lexeme();
+						else return lexeme;
 					}
 
 					// single character lexeme
-					return cur_line[i].ToString();
+					lexeme = cur_line[i].ToString();
+					if (lexeme == string.Empty) Get_Lexeme();
+					else return lexeme;
 				}
 			}
-			return lexeme; // some lexeme
+			if (lexeme == string.Empty) Get_Lexeme();
+			return lexeme;
 		}
-
 	}
 }

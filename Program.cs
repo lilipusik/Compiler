@@ -12,17 +12,22 @@ namespace Compiler
 	{
 		static void Main(string[] args)
 		{
-			using (StreamReader sr = new StreamReader("Pascal_code.txt")) // reading pascal code
+			using (StreamReader sr = new StreamReader("Pascal_code.txt"))
+			{
+				using (StreamWriter sw = new StreamWriter("Compiler_Work.txt"))
+				{
+					Syntaxer syntaxer = new Syntaxer(sw, sr);
+					syntaxer.Program(Blocks.PROGRAM);
+				}
+			}
+
+			/*using (StreamReader sr = new StreamReader("Pascal_code.txt")) // reading pascal code
 			{
 				string line;
 				Position position = new Position();
 
 				using (StreamWriter sw = new StreamWriter("Compiler_Work.txt")) // writing result compiler work
 				{
-
-					/*Sytaxer sytaxer = new Sytaxer(sr, sw);
-					sytaxer.Program(Blocks.PROGRAM);*/
-
 					while ((line = sr.ReadLine()) != null)
 					{
 						File_Work file = new File_Work(line, position);
@@ -53,7 +58,7 @@ namespace Compiler
 						position = new Position(position.Get_Position().Item1 + 1);
 					}
 				}
-			}
+			}*/
 		}
 	}
 }

@@ -10,22 +10,29 @@ namespace Compiler
 {
 	enum Blocks { PROGRAM, PROGRAM_NAME, SEMICOLON, VAR, BLOCK, POINT };
 
-	class Sytaxer
+	class Syntaxer
 	{
-		StreamReader reader; StreamWriter writer;
+		StreamWriter writer; StreamReader reader;
+
+		File_Work file;
+		Lexer lexer;
 
 		string line;
 		Position position;
 		string lexeme;
-		Token cur_token;
+		Token token;
 		List<KeyWords> startes = new List<KeyWords>();
 
-		public Sytaxer(StreamReader sr, StreamWriter sw) 
+
+		public Syntaxer(StreamWriter sw, StreamReader sr)
 		{
-			this.reader = sr;
-			this.writer = sw;
+			writer = sw; reader = sr;
+
+			file = new File_Work(reader);
 			position = new Position();
-			line = sr.ReadLine();
+			lexer = new Lexer(file);
+
+			New_Token();
 		}
 
 		private void Print_Error(string message, string type)
@@ -33,14 +40,41 @@ namespace Compiler
 			writer.WriteLine(new Error(message, position, lexeme, type));
 		}
 
+		private void Print_LexemeToken()
+		{
+			writer.WriteLine("lexeme: " + lexeme + "\n" + token + " -> " + position + "\n");
+		}
+
 		public void Next_Token()
 		{
+			position = new Position(file.Get_Position().Item1, file.Get_Position().Item2 + 1);
 
+			file = new File_Work(reader, position, file.Get_Line());
+			lexer = new Lexer(file);
+			New_Token();
+		}
+
+		private void New_Token()
+		{
+			lexeme = lexer.Get_Lexeme();
+			reader = file.Get_StreamReader();
+
+			while (lexeme == string.Empty)
+			{
+				position = new Position(position.Get_Position().Item1, position.Get_Position().Item2 + 1);
+				file = new File_Work(reader, position, file.Get_Line());
+				lexer = new Lexer(file);
+				lexeme = lexer.Get_Lexeme();
+				reader = file.Get_StreamReader();
+			}
+
+			token = lexer.Get_Token();
+
+			Print_LexemeToken();
 		}
 
 		public void Program(Blocks order)
 		{
-			Next_Token();
 			bool flag = true;
 			while (flag)
 			{
@@ -85,18 +119,18 @@ namespace Compiler
 						}
 						break;
 
-					case Blocks.VAR: break;
+					case Blocks.VAR: flag = false; break;
 
-					case Blocks.BLOCK: break;
+					case Blocks.BLOCK: flag = false; break;
 
-					case Blocks.POINT: break;
+					case Blocks.POINT: flag = false; break;
 				}
 			}
 		}
 
 		private bool Accept(Token_type token_type)
 		{
-			return cur_token.Get_Type() == token_type;
+			return token.Get_Type() == token_type;
 		}
 
 		private bool Accept(KeyWords key)
@@ -106,12 +140,12 @@ namespace Compiler
 
 		private bool Correct_Keyword(KeyWords desired)
 		{
-			return cur_token is KeyWord key && key.Get_Type_KeyWord() == desired;
+			return token is KeyWord key && key.Get_Type_KeyWord() == desired;
 		}
 
 		private bool Correct_In_Startes()
 		{
-			return cur_token is KeyWord key && startes.Contains(key.Get_Type_KeyWord());
+			return token is KeyWord key && startes.Contains(key.Get_Type_KeyWord());
 		}
 	}
 }
