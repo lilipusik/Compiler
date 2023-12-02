@@ -87,7 +87,7 @@ namespace Compiler
 					}
 
 					// move to next lexeme
-					if (cur_line[i] == ' ' || cur_line[i] == '\t') break;
+					if (cur_line[i] == ' ' || cur_line[i] == '\t') continue;
 
 					// lexeme from double operator
 					if (i + 1 < cur_line.Length && double_symbols.Contains(cur_line[i]) && double_symbols.Contains(cur_line[i + 1]))

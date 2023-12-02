@@ -20,6 +20,14 @@ namespace Compiler
 			type = Token_type.CONST;
 		}
 
+		public static Const_type Get_Const_Type(KeyWords keyWord)
+		{
+			if (keyWord == KeyWords.INTEGER) return Const_type.INTEGER;
+			if (keyWord == KeyWords.FLOAT) return Const_type.FLOAT;
+			if (keyWord == KeyWords.BOOLEAN) return Const_type.BOOLEAN;
+			return Const_type.STRING;
+		}
+
 		public Const_type Get_Const_Type()
 		{
 			return const_type;
