@@ -9,8 +9,8 @@ namespace Compiler.Analyzers
 {
 	internal class Lexer
 	{
-		string lexeme;
-		Position position;
+		private string lexeme;
+		private Position position;
 
 		public Lexer(File_Work file)
 		{
@@ -59,11 +59,10 @@ namespace Compiler.Analyzers
 			if (KeyWord.Is_KeyWord(lexeme)) return new KeyWord(KeyWord.Get_KeyWord(lexeme), position);
 
 			Const_type const_Type = Const_type.STRING;
-			if (Is_Constant(ref const_Type)) return new Constant(const_Type, lexeme, position);
+			if (Is_Constant(ref const_Type)) return new Constant(const_Type, position);
 
 			if (Is_Identifier()) return new Identifier(lexeme, position);
 
-			//writer.WriteLine(new Error("Unrecoghized characters", position, lexeme, "Syntax error"));
 			return new Unknown(lexeme, position);
 		}
 	}

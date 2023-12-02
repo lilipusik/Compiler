@@ -12,15 +12,15 @@ namespace Compiler
 
 	class Syntaxer
 	{
-		StreamWriter writer; StreamReader reader;
+		private StreamWriter writer; StreamReader reader;
 
-		File_Work file;
-		Lexer lexer;
+		private File_Work file; Lexer lexer;
 
-		Position position;
-		string lexeme;
-		Token token;
+		private Position position;
+		private string lexeme;
+		private Token token;
 
+		private List<bool> brackets = new List<bool>();
 
 		public Syntaxer(StreamWriter sw, StreamReader sr)
 		{
@@ -29,10 +29,10 @@ namespace Compiler
 			file = new File_Work(reader);
 			position = new Position();
 			lexer = new Lexer(file);
-
 			New_Token();
 		}
 
+		//----------------- Write result
 		private void Print_Error(string message, string type)
 		{
 			writer.WriteLine(new Error(message, position, lexeme, type) + "\n");
@@ -44,6 +44,7 @@ namespace Compiler
 				$"{new Position(position.Get_Position().Item1, position.Get_Position().Item2 - lexeme.Length)}\n");
 		}
 
+		//----------------- Get new token
 		public void Next_Token()
 		{
 			file = new File_Work(reader, position, file.Get_Line());
@@ -70,11 +71,11 @@ namespace Compiler
 			Print_LexemeToken();
 		}
 
+		//----------------- BNF
 		public void Program(Blocks order)
 		{
 			bool flag = true;
 			while (flag)
-			{
 				switch (order)
 				{
 					case Blocks.PROGRAM:
@@ -103,9 +104,8 @@ namespace Compiler
 						break;
 
 					case Blocks.VAR:
-						if (Accept(KeyWords.VAR)) VAR();
+						if (Accept(KeyWords.VAR)) Var();
 						order = Blocks.BLOCK;
-						Next_Token();
 						break;
 
 					case Blocks.BLOCK: 
@@ -115,26 +115,142 @@ namespace Compiler
 						break;
 
 					case Blocks.POINT:
-						if (!Accept(KeyWords.POINT)) Print_Error("Not found point after block program", "Synatax error");
+						if (!Accept(KeyWords.POINT)) Print_Error("Not found point after block program", "Syntax error");
 						flag = false; 
 						break;
 				}
-			}
 		}
 
-		private void Block()
+		private void String_Expression()
 		{
 
 		}
 
-		private void VAR()
+		private void Bool_Expression()
+		{
+
+		}
+
+		private bool Factor()
+		{
+			if (Accept(Token_type.IDENTIFIER) || Accept(Token_type.CONST) || 
+				Accept(new List<KeyWords>() { KeyWords.MULTI, KeyWords.DIV, KeyWords.MOD })) 
+			{
+				if (Accept(Token_type.IDENTIFIER) &&
+					Semanter.Type_Variable(lexeme) != Const_type.INTEGER && Semanter.Type_Variable(lexeme) != Const_type.FLOAT ||
+					Accept(Token_type.CONST) && 
+					((Constant)token).Get_Const_Type() != Const_type.INTEGER && 
+					((Constant)token).Get_Const_Type() != Const_type.FLOAT)
+					
+					Print_Error("Type mismatch in the expression", "Semantic error");
+
+				Next_Token();
+				return true; 
+			}
+
+			if (Accept(KeyWords.LPAR))
+			{
+				Next_Token();
+				Math_Expression();
+				if (!Accept(KeyWords.RPAR)) Print_Error("Not found closing bracket", "Syntax error");
+				return true;
+			}
+
+			return false;
+		}
+
+		private bool Term()
+		{
+			while (Factor());
+			return false;
+		}
+
+		private void Math_Expression()
+		{
+			while (Term() || Accept(new List<KeyWords>() { KeyWords.PLUS, KeyWords.MINUS })) Next_Token();
+		}
+
+		private void Choose_Expression(Const_type type)
+		{
+			switch(type)
+			{
+				case Const_type.INTEGER:
+				case Const_type.FLOAT:
+					Math_Expression();
+					break;
+				case Const_type.BOOLEAN:
+					Bool_Expression();
+					break;
+				case Const_type.STRING:
+					String_Expression();
+					break;
+			}
+		}
+
+		private void Expression()
+		{
+			if (Accept(KeyWords.ASSIGN))
+			{
+				Next_Token();
+				if (Accept(Token_type.IDENTIFIER))
+				{
+					if (!Semanter.Has_Variable(lexeme)) { Print_Error("Not found variable definition", "Syntax error"); return; }
+					Choose_Expression(Semanter.Type_Variable(lexeme));
+				}
+				else if (Accept(Token_type.CONST))
+					Choose_Expression(((Constant)token).Get_Const_Type());
+			}
+			else Print_Error("Expression must have an assignment sign", "Syntax Error");
+		}
+
+		private bool Operator()
+		{
+			if (Accept(Token_type.IDENTIFIER))
+			{
+				Next_Token();
+				Expression();
+				return true;
+			}
+			else if (Accept(KeyWords.IF))
+			{
+				Next_Token();
+				// условный оператор
+				return true;
+			}
+			else if (Accept(KeyWords.WHILE))
+			{
+				Next_Token();
+				// цикл 
+				return true;
+			}
+			else if (Accept(KeyWords.SEMICOLON))
+			{
+				Next_Token();
+				Operator();
+				return true;
+			}
+			return false;
+		}
+
+		private void Block()
+		{
+			if (!Accept(KeyWords.BEGIN)) Print_Error("Uncorrect block start (not found begin)", "Syntax error");
+			else
+			{
+				Next_Token();
+				while (Operator()) Next_Token();
+				if (!Accept(KeyWords.END)) Print_Error("Uncorrect block end (not found end)", "Syntax error");
+			}
+		}
+
+		private void Var()
 		{
 			Next_Token();
 			List<string> variables = new List<string>();
 
 			while (Accept(Token_type.IDENTIFIER)) // new variable
 			{
-				if (Semanter.Has_Variable(lexeme)) Print_Error("Variable is already defined", "Sematic error");
+				if (Semanter.Has_Variable(lexeme)) Print_Error("Variable is already defined", "Semantic error");
 				else variables.Add(lexeme);
 
 				Next_Token();
@@ -159,6 +275,7 @@ namespace Compiler
 			}
 		}
 
+		//----------------- Checking type
 		private bool Accept(List<KeyWords> keys)
 		{
 			return token is KeyWord key && keys.Contains(key.Get_Type_KeyWord());

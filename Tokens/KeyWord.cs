@@ -17,19 +17,6 @@ namespace Compiler
 
 	class KeyWord : Token
 	{
-		KeyWords keyword;
-
-		public KeyWord(KeyWords key, Position position) : base(type, position)
-		{
-			this.keyword = key;
-			type = Token_type.KEYWORD;
-		}
-
-		public override string ToString()
-		{
-			return $"token: {type} ({keyword})";
-		}
-
 		private static Dictionary<string, KeyWords> keywords = new Dictionary<string, KeyWords>
 		{
 			{ "program", KeyWords.PROGRAM },
@@ -74,6 +61,18 @@ namespace Compiler
 			{ "string", KeyWords.STRING },
 			{ "boolean", KeyWords.BOOLEAN }
 		};
+		private KeyWords keyword;
+
+		public KeyWord(KeyWords key, Position position) : base(type, position)
+		{
+			this.keyword = key;
+			type = Token_type.KEYWORD;
+		}
+
+		public override string ToString()
+		{
+			return $"token: {type} ({keyword})";
+		}
 
 		public KeyWords Get_Type_KeyWord()
 		{

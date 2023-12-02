@@ -9,11 +9,11 @@ namespace Compiler
 {
 	class File_Work
 	{
-		StreamReader reader;
-		string cur_line;
-		Position cur_position;
-		List<char> separate_symbols = new List<char> { '<', '>', '=', ':', '+', '-', '*', '(', ')', '{', '}', '[', ']', ';', ':', ',', '.', ' ', '/', '"', '\t'};
-		List<char> double_symbols = new List<char> { '<', '>', '=', ':' };
+		private StreamReader reader;
+		private string cur_line;
+		private Position cur_position;
+		private List<char> separate_symbols = new List<char> { '<', '>', '=', ':', '+', '-', '*', '(', ')', '{', '}', '[', ']', ';', ':', ',', '.', ' ', '/', '"', '\t'};
+		private List<char> double_symbols = new List<char> { '<', '>', '=', ':' };
 
 		public File_Work(StreamReader reader)
 		{

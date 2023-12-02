@@ -10,13 +10,11 @@ namespace Compiler
 
 	class Constant : Token
 	{
-		string lexeme;
-		Const_type const_type;
+		private Const_type const_type;
 
-		public Constant(Const_type const_type, string lexeme, Position position) : base(type, position)
+		public Constant(Const_type const_type, Position position) : base(type, position)
 		{
 			this.const_type = const_type;
-			this.lexeme = lexeme;
 			type = Token_type.CONST;
 		}
 

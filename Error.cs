@@ -9,10 +9,10 @@ namespace Compiler
 {
 	class Error
 	{
-		string message;
-		string type;
-		Position position;
-		string lexeme;
+		private string message;
+		private string type;
+		private Position position;
+		private string lexeme;
 
 		public Error(string message, Position position, string lexeme, string type)
 		{
