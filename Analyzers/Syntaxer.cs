@@ -216,7 +216,8 @@ namespace Compiler
 			}
 			else if (flag)
 			{
-				Choose_Expression(Semanter.Type_Variable(lex));
+				if (!Semanter.Has_Variable(lex)) Print_Error("Not found variable definition", "Syntax error");
+				else Choose_Expression(Semanter.Type_Variable(lex));
 				Next_Token();
 				if (Accept(Token_type.IDENTIFIER))
 				{
@@ -234,7 +235,9 @@ namespace Compiler
 			string lex = lexeme;
 			if (Accept(Token_type.IDENTIFIER))
 			{
-				Semanter.New_Assignment(lex);
+				if (!Semanter.Has_Variable(lex)) Print_Error("Not found variable definition", "Syntax error");
+				else 
+					Semanter.New_Assignment(lex);
 				Next_Token();
 				Expression(lex, false);
 				return true;
