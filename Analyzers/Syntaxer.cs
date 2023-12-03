@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 
 namespace Compiler
 {
-	enum Blocks { PROGRAM, PROGRAM_NAME, SEMICOLON, VAR, BLOCK, POINT };
-
 	class Syntaxer
 	{
 		private StreamWriter writer; StreamReader reader;
@@ -19,8 +17,6 @@ namespace Compiler
 		private Position position;
 		private string lexeme;
 		private Token token;
-
-		private List<bool> brackets = new List<bool>();
 
 		public Syntaxer(StreamWriter sw, StreamReader sr)
 		{
@@ -72,63 +68,60 @@ namespace Compiler
 		}
 
 		//----------------- BNF
-		public void Program(Blocks order)
+		public void Program()
 		{
-			bool flag = true;
-			while (flag)
-				switch (order)
-				{
-					case Blocks.PROGRAM:
-						if (Accept(KeyWords.PROGRAM))
-						{
-							order = Blocks.PROGRAM_NAME;
-							Next_Token();
-						}
-						else
-						{
-							Print_Error("Uncorrect program start", "Syntax error");
-							flag = false;
-						}
-						break;
+			if (!Accept(KeyWords.PROGRAM)) Print_Error("Uncorrect program start", "Syntax error");
+			else
+			{
+				Next_Token();
+				if (!Accept(Token_type.IDENTIFIER)) Print_Error("Uncorrect program name", "Syntax error");
 
-					case Blocks.PROGRAM_NAME:
-						if (!Accept(Token_type.IDENTIFIER)) Print_Error("Uncorrect program name", "Syntax error");
-						order = Blocks.SEMICOLON;
-						Next_Token();
-						break;
+				Next_Token();
+				if (!Accept(KeyWords.SEMICOLON)) Print_Error("Not found semicolon after program name", "Syntax error");
 
-					case Blocks.SEMICOLON:
-						if (!Accept(KeyWords.SEMICOLON)) Print_Error("Not found semicolon after program name", "Syntax error");
-						order = Blocks.VAR;
-						Next_Token();
-						break;
+				Next_Token();
+				if (Accept(KeyWords.VAR)) Var();
 
-					case Blocks.VAR:
-						if (Accept(KeyWords.VAR)) Var();
-						order = Blocks.BLOCK;
-						break;
+				Block();
 
-					case Blocks.BLOCK: 
-						Block();
-						order = Blocks.POINT;
-						Next_Token(); 
-						break;
+				Next_Token();
+				if (!Accept(KeyWords.POINT)) Print_Error("Not found point after block program", "Syntax error");
+			}
+		}
 
-					case Blocks.POINT:
-						if (!Accept(KeyWords.POINT)) Print_Error("Not found point after block program", "Syntax error");
-						flag = false; 
-						break;
-				}
+		private bool String_Term()
+		{
+			if (Accept(Token_type.IDENTIFIER) || Accept(Token_type.CONST))
+			{
+				if (Accept(Token_type.IDENTIFIER) &&
+					Semanter.Type_Variable(lexeme) != Const_type.STRING ||
+					Accept(Token_type.CONST) && ((Constant)token).Get_Const_Type() != Const_type.STRING)
+
+					Print_Error("Type mismatch in the expression", "Semantic error");
+
+				return true;
+			}
+			return false;
 		}
 
 		private void String_Expression()
 		{
+			while (String_Term() || Accept(KeyWords.PLUS)) { Next_Token(); }
+		}
+
+		/*private bool Relation()
+		{
 
 		}
 
+		private bool Simple_Bool_Expr()
+		{
+			
+		}*/
+
 		private void Bool_Expression()
 		{
-
+			//while(Simple_Bool_Expr() || )
 		}
 
 		private bool Factor()
@@ -189,18 +182,13 @@ namespace Compiler
 
 		private void Expression()
 		{
-			if (Accept(KeyWords.ASSIGN))
-			{
-				Next_Token();
-				if (Accept(Token_type.IDENTIFIER))
-				{
-					if (!Semanter.Has_Variable(lexeme)) { Print_Error("Not found variable definition", "Syntax error"); return; }
-					Choose_Expression(Semanter.Type_Variable(lexeme));
-				}
-				else if (Accept(Token_type.CONST))
-					Choose_Expression(((Constant)token).Get_Const_Type());
-			}
-			else Print_Error("Expression must have an assignment sign", "Syntax Error");
+			Next_Token();
+			if (Accept(Token_type.IDENTIFIER))
+				if (!Semanter.Has_Variable(lexeme)) Print_Error("Not found variable definition", "Syntax error");
+				else Choose_Expression(Semanter.Type_Variable(lexeme));
+
+			else if (Accept(Token_type.CONST))
+				Choose_Expression(((Constant)token).Get_Const_Type());
 		}
 
 		private bool Operator()
@@ -208,19 +196,38 @@ namespace Compiler
 			if (Accept(Token_type.IDENTIFIER))
 			{
 				Next_Token();
-				Expression();
+				if (Accept(KeyWords.ASSIGN)) Expression();
+				else Print_Error("Only assignment and call expressions can be used as an operator", "Syntax error");
 				return true;
 			}
 			else if (Accept(KeyWords.IF))
 			{
 				Next_Token();
-				// условный оператор
+				Bool_Expression();
+				New_Token();
+				if (!Accept(KeyWords.THEN)) { Print_Error("Not found keyword then after bool expression", "Syntax error"); return false; }
+				Next_Token();
+				if (!Accept(KeyWords.BEGIN)) { Print_Error("Not found begin after bool expression", "Syntax error"); return false; }
+				Next_Token();
+				Operator();
+				Next_Token();
+				if (!Accept(KeyWords.END)) Print_Error("Not found end after if block", "Syntax error");
+				Next_Token();
+				if (Accept(KeyWords.ELSE))
+				{
+					Next_Token();
+					if (!Accept(KeyWords.BEGIN)) { Print_Error("Not found begin after bool expression", "Syntax error"); return false; }
+					Operator();
+					if (!Accept(KeyWords.END)) Print_Error("Not found end after else block", "Syntax error");
+					Next_Token();
+					if (!Accept(KeyWords.SEMICOLON)) Print_Error("Not found semicolon after else block end", "Syntax error");
+				}
 				return true;
 			}
 			else if (Accept(KeyWords.WHILE))
 			{
 				Next_Token();
-				// цикл 
+				Bool_Expression();
 				return true;
 			}
 			else if (Accept(KeyWords.SEMICOLON))

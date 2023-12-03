@@ -17,7 +17,7 @@ namespace Compiler
 				using (StreamWriter sw = new StreamWriter("Compiler_Work.txt"))
 				{
 					Syntaxer syntaxer = new Syntaxer(sw, sr);
-					syntaxer.Program(Blocks.PROGRAM);
+					syntaxer.Program();
 				}
 			}
 		}
