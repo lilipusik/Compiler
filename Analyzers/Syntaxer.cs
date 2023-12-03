@@ -99,6 +99,8 @@ namespace Compiler
 
 					Print_Error("Type mismatch in the expression", "Semantic error");
 
+				if (Accept(Token_type.IDENTIFIER) && !Semanter.Is_Assignment(lexeme)) Print_Error("Using a variable without a value", "Semantic error");
+
 				return true;
 			}
 			return false;
@@ -109,19 +111,36 @@ namespace Compiler
 			while (String_Term() || Accept(KeyWords.PLUS)) { Next_Token(); }
 		}
 
-		/*private bool Relation()
+		private bool Bool_Factor()
 		{
+			if (Accept(Token_type.IDENTIFIER) || Accept(Token_type.CONST) || Accept(KeyWords.AND))
+			{
+				if (Accept(Token_type.IDENTIFIER) && !Semanter.Is_Assignment(lexeme)) Print_Error("Using a variable without a value", "Semantic error");
 
+				Next_Token();
+
+				return true;
+			}
+
+			return false;
+		}
+
+		private bool Bool_Temp()
+		{
+			while (Bool_Factor());
+			return false;
 		}
 
 		private bool Simple_Bool_Expr()
 		{
-			
-		}*/
+			while (Bool_Temp() || Accept(KeyWords.OR)) Next_Token();
+			return false;
+		}
 
 		private void Bool_Expression()
 		{
-			//while(Simple_Bool_Expr() || )
+			while (Simple_Bool_Expr() || Accept(new List<KeyWords>() { KeyWords.LESS, KeyWords.LESS_EQUAL, KeyWords.EQUAL, KeyWords.NOT_EQUAL,
+				KeyWords.GREATER_EQUAL, KeyWords.GREATER})) Next_Token();
 		}
 
 		private bool Factor()
@@ -136,6 +155,8 @@ namespace Compiler
 					((Constant)token).Get_Const_Type() != Const_type.FLOAT)
 					
 					Print_Error("Type mismatch in the expression", "Semantic error");
+
+				if (Accept(Token_type.IDENTIFIER) && !Semanter.Is_Assignment(lexeme)) Print_Error("Using a variable without a value", "Semantic error");
 
 				Next_Token();
 				return true; 
@@ -180,44 +201,61 @@ namespace Compiler
 			}
 		}
 
-		private void Expression()
+		private void Expression(string lex, bool flag)
 		{
-			Next_Token();
-			if (Accept(Token_type.IDENTIFIER))
-				if (!Semanter.Has_Variable(lexeme)) Print_Error("Not found variable definition", "Syntax error");
-				else Choose_Expression(Semanter.Type_Variable(lexeme));
-
-			else if (Accept(Token_type.CONST))
-				Choose_Expression(((Constant)token).Get_Const_Type());
+			if (Accept(KeyWords.ASSIGN))
+			{
+				Next_Token();
+				if (Accept(Token_type.IDENTIFIER))
+				{
+					if (!Semanter.Has_Variable(lex)) Print_Error("Not found variable definition", "Syntax error");
+					else Choose_Expression(Semanter.Type_Variable(lex));
+				}
+				else if (Accept(Token_type.CONST))
+					Choose_Expression(((Constant)token).Get_Const_Type());
+			}
+			else if (flag)
+			{
+				Choose_Expression(Semanter.Type_Variable(lex));
+				Next_Token();
+				if (Accept(Token_type.IDENTIFIER))
+				{
+					if (!Semanter.Has_Variable(lex)) Print_Error("Not found variable definition", "Syntax error");
+					else Choose_Expression(Semanter.Type_Variable(lex));
+				}
+				else if (Accept(Token_type.CONST))
+					Choose_Expression(((Constant)token).Get_Const_Type());
+			}
+			else Print_Error("Not found assignment in expression", "Syntax error");
 		}
 
 		private bool Operator()
 		{
+			string lex = lexeme;
 			if (Accept(Token_type.IDENTIFIER))
 			{
+				Semanter.New_Assignment(lex);
 				Next_Token();
-				if (Accept(KeyWords.ASSIGN)) Expression();
-				else Print_Error("Only assignment and call expressions can be used as an operator", "Syntax error");
+				Expression(lex, false);
 				return true;
 			}
 			else if (Accept(KeyWords.IF))
 			{
 				Next_Token();
-				Bool_Expression();
-				New_Token();
+				Expression(lexeme, true);
 				if (!Accept(KeyWords.THEN)) { Print_Error("Not found keyword then after bool expression", "Syntax error"); return false; }
 				Next_Token();
 				if (!Accept(KeyWords.BEGIN)) { Print_Error("Not found begin after bool expression", "Syntax error"); return false; }
 				Next_Token();
-				Operator();
-				Next_Token();
+				while (Operator()) Next_Token();
 				if (!Accept(KeyWords.END)) Print_Error("Not found end after if block", "Syntax error");
 				Next_Token();
 				if (Accept(KeyWords.ELSE))
 				{
 					Next_Token();
 					if (!Accept(KeyWords.BEGIN)) { Print_Error("Not found begin after bool expression", "Syntax error"); return false; }
-					Operator();
+					Next_Token();
+					while (Operator()) Next_Token();
 					if (!Accept(KeyWords.END)) Print_Error("Not found end after else block", "Syntax error");
 					Next_Token();
 					if (!Accept(KeyWords.SEMICOLON)) Print_Error("Not found semicolon after else block end", "Syntax error");
@@ -227,7 +265,15 @@ namespace Compiler
 			else if (Accept(KeyWords.WHILE))
 			{
 				Next_Token();
-				Bool_Expression();
+				Expression(lexeme, true);
+				if (!Accept(KeyWords.DO)) Print_Error("Not found do after while expression", "Syntax Error");
+				Next_Token();
+				if (!Accept(KeyWords.BEGIN)) { Print_Error("Not found begin after while expression", "Syntax error"); return false; }
+				Next_Token();
+				while (Operator()) Next_Token();
+				if (!Accept(KeyWords.END)) Print_Error("Not found end after while block", "Syntax error");
+				Next_Token();
+				if (!Accept(KeyWords.SEMICOLON)) Print_Error("Not found semicolon after while block end", "Syntax error");
 				return true;
 			}
 			else if (Accept(KeyWords.SEMICOLON))
