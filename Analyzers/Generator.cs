@@ -36,18 +36,13 @@ namespace Compiler
 			}
 		}
 
-		public void Add_Code(Function_type type, string lexeme)
+		public void Add_Code_Function(Function_type type, string lexeme)
 		{
 			switch(type)
 			{
 				case Function_type.READLN: cur_scarp_code += $"\n\t\t\t{lexeme} = Console.ReadLine();"; break;
 				case Function_type.WRITELN: cur_scarp_code += $"\n\t\t\tConsole.WriteLine({lexeme});"; break;
 			}
-		}
-
-		public void Add_Code(string code)
-		{
-			cur_scarp_code += code;
 		}
 
 		private void Translate_Pascal_To_CSharp()

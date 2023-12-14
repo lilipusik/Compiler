@@ -21,6 +21,9 @@ namespace Compiler
 
 		public static int Count_Errors { get; private set; }
 
+		private float new_int_float_value = 0;
+		private string new_string_value = "";
+
 		public Syntaxer(StreamWriter sw, StreamReader sr)
 		{
 			writer = sw; reader = sr;
@@ -247,7 +250,8 @@ namespace Compiler
 				else
 				{
 					Next_Token();
-					generator.Add_Code(type, lexeme);
+					generator.Add_Code_Function(type, lexeme);
+					if (type == Function_type.READLN) Add_New_Variable(lexeme);
 					Next_Token();
 					if (!Accept(KeyWords.RPAR)) Print_Error("Not found closing bracket after function", "Syntax error");
 					Next_Token();
@@ -260,6 +264,7 @@ namespace Compiler
 				if (!Semanter.Has_Variable(lex)) Print_Error("Not found variable definition", "Syntax error");
 				Next_Token();
 				Expression(lex, false);
+				Add_New_Variable(lex);
 				return true;
 			}
 			else if (Accept(KeyWords.IF))
@@ -375,6 +380,13 @@ namespace Compiler
 		private Const_type Const_Type()
 		{
 			return Constant.Get_Const_Type(((KeyWord)token).Get_Type_KeyWord());
+		}
+
+		//----------------- On the side
+		private void Add_New_Variable(string lex)
+		{
+			if (Semanter.Type_Variable(lex) == Const_type.STRING) Semanter.New_Assignment(lex, new_string_value);
+			else Semanter.New_Assignment(lex, new_int_float_value);
 		}
 	}
 }
