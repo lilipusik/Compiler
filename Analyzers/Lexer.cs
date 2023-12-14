@@ -23,6 +23,17 @@ namespace Compiler.Analyzers
 			return lexeme;
 		}
 
+		private bool Is_Function(ref Function_type type)
+		{
+			switch (lexeme)
+			{
+				case "writeln": type = Function_type.WRITELN; return true;
+				case "readln": type = Function_type.READLN; return true;
+				default: return false;
+			} 
+			
+		}
+
 		private bool Is_Identifier()
 		{
 			return lexeme.All(x => (x >= 65 && x <= 90) || (x >= 97 && x <= 122) || (x >= 48 && x <= 57) || x == 95) 
@@ -60,6 +71,9 @@ namespace Compiler.Analyzers
 
 			Const_type const_Type = Const_type.STRING;
 			if (Is_Constant(ref const_Type)) return new Constant(const_Type, position);
+
+			Function_type type_func = Function_type.READLN;
+			if (Is_Function(ref type_func)) return new Function(type_func, position);
 
 			if (Is_Identifier()) return new Identifier(lexeme, position);
 

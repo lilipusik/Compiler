@@ -12,11 +12,14 @@ namespace Compiler
 	{
 		private StreamWriter writer; StreamReader reader;
 
-		private File_Work file; Lexer lexer;
+		private File_Work file; private Lexer lexer; 
+		private Generator generator = new Generator();
 
 		private Position position;
 		private string lexeme;
 		private Token token;
+
+		public static int Count_Errors { get; private set; }
 
 		public Syntaxer(StreamWriter sw, StreamReader sr)
 		{
@@ -36,6 +39,7 @@ namespace Compiler
 
 		private void Print_LexemeToken()
 		{
+			Count_Errors++;
 			writer.WriteLine($"lexeme: {lexeme}\n{token} -> " +
 				$"{new Position(position.Get_Position().Item1, position.Get_Position().Item2 - lexeme.Length)}\n");
 		}
@@ -80,12 +84,14 @@ namespace Compiler
 				if (!Accept(KeyWords.SEMICOLON)) Print_Error("Not found semicolon after program name", "Syntax error");
 
 				Next_Token();
-				if (Accept(KeyWords.VAR)) Var();
+				if (Accept(KeyWords.VAR)) { Var(); generator.Traslate_VAR(); }
 
 				Block();
 
 				Next_Token();
 				if (!Accept(KeyWords.POINT)) Print_Error("Not found point after block program", "Syntax error");
+
+				writer.WriteLine("\n\n" + generator.Get_CSharp_Code());
 			}
 		}
 
@@ -233,11 +239,25 @@ namespace Compiler
 		private bool Operator()
 		{
 			string lex = lexeme;
-			if (Accept(Token_type.IDENTIFIER))
+			if (Accept(Token_type.FUNCTION))
+			{
+				Function_type type = ((Function)token).GetFunc_Type();
+				Next_Token();
+				if (!Accept(KeyWords.LPAR)) Print_Error("Not found opening bracket after function", "Syntax error");
+				else
+				{
+					Next_Token();
+					generator.Add_Code(type, lexeme);
+					Next_Token();
+					if (!Accept(KeyWords.RPAR)) Print_Error("Not found closing bracket after function", "Syntax error");
+					Next_Token();
+					if (!Accept(KeyWords.SEMICOLON)) Print_Error("Not found semicolon after function", "Syntax error");
+				}
+				return true;
+			}
+			else if (Accept(Token_type.IDENTIFIER))
 			{
 				if (!Semanter.Has_Variable(lex)) Print_Error("Not found variable definition", "Syntax error");
-				else 
-					Semanter.New_Assignment(lex);
 				Next_Token();
 				Expression(lex, false);
 				return true;
@@ -345,6 +365,11 @@ namespace Compiler
 		private bool Accept(KeyWords key)
 		{
 			return token is KeyWord word && word.Get_Type_KeyWord() == key;
+		}
+
+		private bool Accept(Function_type token_type)
+		{
+			return token is Function f && f.GetFunc_Type() == token_type;
 		}
 
 		private Const_type Const_Type()

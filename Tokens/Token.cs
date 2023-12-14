@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler
 {
-	enum Token_type { IDENTIFIER, CONST, KEYWORD, UNKNOWN };
+	enum Token_type { IDENTIFIER, CONST, KEYWORD, UNKNOWN, FUNCTION };
 
 	abstract class Token
 	{

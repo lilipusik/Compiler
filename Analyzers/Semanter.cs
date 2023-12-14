@@ -9,7 +9,12 @@ namespace Compiler
 	internal class Semanter
 	{
 		private static Dictionary<string, Const_type> variables_type = new Dictionary<string, Const_type>();
-		private static List<string> variables_assignment = new List<string>();
+		private static Dictionary<string, string> variables_value = new Dictionary<string, string>();
+
+		public static Dictionary<string, Const_type> Get_Variables()
+		{
+			return variables_type;
+		}
 
 		public static void Add_Variables(List<string> names, Const_type type)
 		{
@@ -26,14 +31,14 @@ namespace Compiler
 			return variables_type[name];
 		}
 
-		public static void New_Assignment(string name)
+		public static void New_Assignment<T>(string name, T value)
 		{
-			variables_assignment.Add(name);
+			variables_value.Add(name, value.ToString());
 		}
 
 		public static bool Is_Assignment(string name)
 		{
-			return variables_assignment.Contains(name);
+			return variables_value.ContainsKey(name);
 		}
 	}
 }
