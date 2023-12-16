@@ -18,6 +18,7 @@ namespace Compiler
 				{
 					Syntaxer syntaxer = new Syntaxer(sw, sr);
 					syntaxer.Program();
+					sw.Write("\nЗначения переменных:\n"+ Semanter.ToString() + "\nРезультат программы:\n" + Generator.Result);
 				}
 			}
 		}

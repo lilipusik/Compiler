@@ -1,6 +1,7 @@
 ﻿using Compiler.Analyzers;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,17 +13,15 @@ namespace Compiler
 	{
 		private StreamWriter writer; StreamReader reader;
 
-		private File_Work file; private Lexer lexer; 
-		private Generator generator = new Generator();
+		private File_Work file; private Lexer lexer;
 
 		private Position position;
 		private string lexeme;
 		private Token token;
 
-		public static int Count_Errors { get; private set; }
+		public static int Count_Errors { get; private set; } = 0;
 
-		private float new_int_float_value = 0;
-		private string new_string_value = "";
+		private string expression;
 
 		public Syntaxer(StreamWriter sw, StreamReader sr)
 		{
@@ -37,6 +36,7 @@ namespace Compiler
 		//----------------- Write result
 		private void Print_Error(string message, string type)
 		{
+			Count_Errors++;
 			writer.WriteLine(new Error(message, position, lexeme, type) + "\n");
 		}
 
@@ -87,14 +87,12 @@ namespace Compiler
 				if (!Accept(KeyWords.SEMICOLON)) Print_Error("Not found semicolon after program name", "Syntax error");
 
 				Next_Token();
-				if (Accept(KeyWords.VAR)) { Var(); generator.Traslate_VAR(); }
+				if (Accept(KeyWords.VAR)) Var();
 
 				Block();
 
 				Next_Token();
 				if (!Accept(KeyWords.POINT)) Print_Error("Not found point after block program", "Syntax error");
-
-				writer.WriteLine("\n\n" + generator.Get_CSharp_Code());
 			}
 		}
 
@@ -117,7 +115,8 @@ namespace Compiler
 
 		private void String_Expression()
 		{
-			while (String_Term() || Accept(KeyWords.PLUS)) { Next_Token(); }
+			while (String_Term() || Accept(KeyWords.PLUS)) { Next_Token(); expression += lexeme; }
+			expression = expression.Substring(0, expression.Length - lexeme.Length);
 		}
 
 		private bool Bool_Factor()
@@ -168,12 +167,14 @@ namespace Compiler
 				if (Accept(Token_type.IDENTIFIER) && !Semanter.Is_Assignment(lexeme)) Print_Error("Using a variable without a value", "Semantic error");
 
 				Next_Token();
+				expression += lexeme;
 				return true; 
 			}
 
 			if (Accept(KeyWords.LPAR))
 			{
 				Next_Token();
+				expression += lexeme;
 				Math_Expression();
 				if (!Accept(KeyWords.RPAR)) Print_Error("Not found closing bracket", "Syntax error");
 				return true;
@@ -190,7 +191,7 @@ namespace Compiler
 
 		private void Math_Expression()
 		{
-			while (Term() || Accept(new List<KeyWords>() { KeyWords.PLUS, KeyWords.MINUS })) Next_Token();
+			while (Term() || Accept(new List<KeyWords>() { KeyWords.PLUS, KeyWords.MINUS })) { Next_Token(); expression += lexeme; }
 		}
 
 		private void Choose_Expression(Const_type type)
@@ -215,6 +216,7 @@ namespace Compiler
 			if (Accept(KeyWords.ASSIGN))
 			{
 				Next_Token();
+				expression += lexeme;
 				if (Accept(Token_type.IDENTIFIER))
 				{
 					if (!Semanter.Has_Variable(lex)) Print_Error("Not found variable definition", "Syntax error");
@@ -228,6 +230,7 @@ namespace Compiler
 				if (!Semanter.Has_Variable(lex)) Print_Error("Not found variable definition", "Syntax error");
 				else Choose_Expression(Semanter.Type_Variable(lex));
 				Next_Token();
+				expression += lexeme;
 				if (Accept(Token_type.IDENTIFIER))
 				{
 					if (!Semanter.Has_Variable(lex)) Print_Error("Not found variable definition", "Syntax error");
@@ -241,6 +244,7 @@ namespace Compiler
 
 		private bool Operator()
 		{
+			expression = string.Empty;
 			string lex = lexeme;
 			if (Accept(Token_type.FUNCTION))
 			{
@@ -250,8 +254,29 @@ namespace Compiler
 				else
 				{
 					Next_Token();
-					generator.Add_Code_Function(type, lexeme);
-					if (type == Function_type.READLN) Add_New_Variable(lexeme);
+					if (type == Function_type.READLN)
+					{
+						expression = Console.ReadLine();
+						Const_type const_ = Semanter.Type_Variable(lexeme);
+						switch (const_)
+						{
+							case Const_type.INTEGER:
+								if (!int.TryParse(expression, out _))
+									Print_Error("Data entry error", "Semantic error");
+								break;
+							case Const_type.FLOAT:
+								if (!double.TryParse(expression, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out _))
+									Print_Error("Data entry error", "Semantic error");
+								break;
+						}
+						Semanter.New_Assignment(lexeme, expression);
+					}
+					else
+					{
+						Generator generator = new Generator(lexeme);
+						generator.Expression_Calculator();
+						if (Generator.Result == "error") Print_Error("Calculation error", "Semantic error");
+					}
 					Next_Token();
 					if (!Accept(KeyWords.RPAR)) Print_Error("Not found closing bracket after function", "Syntax error");
 					Next_Token();
@@ -264,7 +289,7 @@ namespace Compiler
 				if (!Semanter.Has_Variable(lex)) Print_Error("Not found variable definition", "Syntax error");
 				Next_Token();
 				Expression(lex, false);
-				Add_New_Variable(lex);
+				Semanter.New_Assignment(lex, expression);
 				return true;
 			}
 			else if (Accept(KeyWords.IF))
@@ -372,21 +397,9 @@ namespace Compiler
 			return token is KeyWord word && word.Get_Type_KeyWord() == key;
 		}
 
-		private bool Accept(Function_type token_type)
-		{
-			return token is Function f && f.GetFunc_Type() == token_type;
-		}
-
 		private Const_type Const_Type()
 		{
 			return Constant.Get_Const_Type(((KeyWord)token).Get_Type_KeyWord());
-		}
-
-		//----------------- On the side
-		private void Add_New_Variable(string lex)
-		{
-			if (Semanter.Type_Variable(lex) == Const_type.STRING) Semanter.New_Assignment(lex, new_string_value);
-			else Semanter.New_Assignment(lex, new_int_float_value);
 		}
 	}
 }

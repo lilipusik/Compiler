@@ -11,6 +11,20 @@ namespace Compiler
 		private static Dictionary<string, Const_type> variables_type = new Dictionary<string, Const_type>();
 		private static Dictionary<string, string> variables_value = new Dictionary<string, string>();
 
+		public static string ToString()
+		{
+			string str = string.Empty;
+			foreach (var variable in variables_value)
+				str += variable.Key + " " + variable.Value + "\n";
+			return str;
+		}
+
+		public static string Get_Value(string name)
+		{
+			if (variables_type.ContainsKey(name)) return variables_value[name];
+			else return string.Empty;
+		}
+
 		public static Dictionary<string, Const_type> Get_Variables()
 		{
 			return variables_type;
@@ -33,7 +47,14 @@ namespace Compiler
 
 		public static void New_Assignment<T>(string name, T value)
 		{
-			variables_value.Add(name, value.ToString());
+			if (!variables_type.ContainsKey(name))
+				variables_value.Add(name, value.ToString());
+			else Update_Assignment(name, value);
+		}
+
+		public static void Update_Assignment<T>(string name, T value)
+		{
+			variables_value[name] = value.ToString();
 		}
 
 		public static bool Is_Assignment(string name)
