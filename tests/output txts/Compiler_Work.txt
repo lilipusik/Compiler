@@ -1,0 +1,201 @@
+lexeme: program
+token: KEYWORD (PROGRAM) -> (1, 1)
+
+lexeme: name
+token: IDENTIFIER -> (1, 9)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (1, 13)
+
+lexeme: var
+token: KEYWORD (VAR) -> (2, 1)
+
+lexeme: a
+token: IDENTIFIER -> (2, 5)
+
+lexeme: ,
+token: KEYWORD (COMMA) -> (2, 6)
+
+lexeme: b
+token: IDENTIFIER -> (2, 8)
+
+lexeme: :
+token: KEYWORD (COLON) -> (2, 9)
+
+lexeme: float
+token: KEYWORD (FLOAT) -> (2, 11)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (2, 16)
+
+lexeme: c
+token: IDENTIFIER -> (3, 5)
+
+lexeme: ,
+token: KEYWORD (COMMA) -> (3, 6)
+
+lexeme: i
+token: IDENTIFIER -> (3, 8)
+
+lexeme: :
+token: KEYWORD (COLON) -> (3, 9)
+
+lexeme: integer
+token: KEYWORD (INTEGER) -> (3, 11)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (3, 18)
+
+lexeme: d
+token: IDENTIFIER -> (4, 5)
+
+lexeme: :
+token: KEYWORD (COLON) -> (4, 6)
+
+lexeme: string
+token: KEYWORD (STRING) -> (4, 8)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (4, 14)
+
+lexeme: e
+token: IDENTIFIER -> (5, 5)
+
+lexeme: ,
+token: KEYWORD (COMMA) -> (5, 6)
+
+lexeme: f
+token: IDENTIFIER -> (5, 8)
+
+lexeme: :
+token: KEYWORD (COLON) -> (5, 9)
+
+lexeme: boolean
+token: KEYWORD (BOOLEAN) -> (5, 11)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (5, 18)
+
+lexeme: begin
+token: KEYWORD (BEGIN) -> (6, 1)
+
+lexeme: writeln
+token: FUNCTION (WRITELN) -> (7, 5)
+
+lexeme: (
+token: KEYWORD (LPAR) -> (7, 12)
+
+lexeme: "Write a = "
+token: CONST (STRING) -> (7, 13)
+
+lexeme: )
+token: KEYWORD (RPAR) -> (7, 25)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (7, 26)
+
+lexeme: readln
+token: FUNCTION (READLN) -> (8, 5)
+
+lexeme: (
+token: KEYWORD (LPAR) -> (8, 11)
+
+lexeme: a
+token: IDENTIFIER -> (8, 12)
+
+lexeme: )
+token: KEYWORD (RPAR) -> (8, 13)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (8, 14)
+
+lexeme: b
+token: IDENTIFIER -> (9, 5)
+
+lexeme: :=
+token: KEYWORD (ASSIGN) -> (9, 7)
+
+lexeme: 8
+token: CONST (INTEGER) -> (9, 10)
+
+lexeme: +
+token: KEYWORD (PLUS) -> (9, 12)
+
+lexeme: a
+token: IDENTIFIER -> (9, 14)
+
+lexeme: *
+token: KEYWORD (MULTI) -> (9, 16)
+
+lexeme: (
+token: KEYWORD (LPAR) -> (9, 18)
+
+lexeme: 7,4
+token: CONST (FLOAT) -> (9, 19)
+
+lexeme: +
+token: KEYWORD (PLUS) -> (9, 23)
+
+lexeme: 7
+token: CONST (INTEGER) -> (9, 25)
+
+lexeme: )
+token: KEYWORD (RPAR) -> (9, 26)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (9, 27)
+
+lexeme: d
+token: IDENTIFIER -> (10, 5)
+
+lexeme: :=
+token: KEYWORD (ASSIGN) -> (10, 7)
+
+lexeme: "stroka"
+token: CONST (STRING) -> (10, 10)
+
+lexeme: +
+token: KEYWORD (PLUS) -> (10, 19)
+
+lexeme: "str2"
+token: CONST (STRING) -> (10, 21)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (10, 27)
+
+lexeme: writeln
+token: FUNCTION (WRITELN) -> (11, 5)
+
+lexeme: (
+token: KEYWORD (LPAR) -> (11, 12)
+
+lexeme: b
+token: IDENTIFIER -> (11, 13)
+
+lexeme: )
+token: KEYWORD (RPAR) -> (11, 14)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (11, 15)
+
+lexeme: writeln
+token: FUNCTION (WRITELN) -> (12, 5)
+
+lexeme: (
+token: KEYWORD (LPAR) -> (12, 12)
+
+lexeme: d
+token: IDENTIFIER -> (12, 13)
+
+lexeme: )
+token: KEYWORD (RPAR) -> (12, 14)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (12, 15)
+
+lexeme: end
+token: KEYWORD (END) -> (13, 1)
+
+lexeme: .
+token: KEYWORD (POINT) -> (13, 4)
+

@@ -22,7 +22,7 @@ namespace Compiler
 		public static string Get_Value(string name)
 		{
 			if (variables_type.ContainsKey(name)) return variables_value[name];
-			else return string.Empty;
+			else return name;
 		}
 
 		public static Dictionary<string, Const_type> Get_Variables()

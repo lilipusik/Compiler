@@ -42,7 +42,6 @@ namespace Compiler
 
 		private void Print_LexemeToken()
 		{
-			Count_Errors++;
 			writer.WriteLine($"lexeme: {lexeme}\n{token} -> " +
 				$"{new Position(position.Get_Position().Item1, position.Get_Position().Item2 - lexeme.Length)}\n");
 		}
@@ -265,17 +264,21 @@ namespace Compiler
 									Print_Error("Data entry error", "Semantic error");
 								break;
 							case Const_type.FLOAT:
-								if (!double.TryParse(expression, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out _))
+								double p;
+								if (!double.TryParse(expression, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out p))
 									Print_Error("Data entry error", "Semantic error");
+								else expression = p.ToString();
 								break;
 						}
 						Semanter.New_Assignment(lexeme, expression);
+						Generator.Add_Code(type, lexeme, const_);
 					}
 					else
 					{
 						Generator generator = new Generator(lexeme);
 						generator.Expression_Calculator();
 						if (Generator.Result == "error") Print_Error("Calculation error", "Semantic error");
+						else if (Generator.Result != string.Empty) Generator.Writeline();
 					}
 					Next_Token();
 					if (!Accept(KeyWords.RPAR)) Print_Error("Not found closing bracket after function", "Syntax error");
@@ -379,6 +382,8 @@ namespace Compiler
 				}
 				Next_Token();
 			}
+
+			Generator.Traslate_VAR();
 		}
 
 		//----------------- Checking type
