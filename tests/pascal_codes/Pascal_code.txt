@@ -4,10 +4,13 @@ var a, b: float;
     d: string;
     e, f: boolean;
 begin
-    writeln("Write a = ");
+    writeln("Write a:");
     readln(a);
     b := 8 + a * (7.4 + 7);
-    d := "stroka" + "str2";
+    writeln("Write d:");
+    readln(d);
+    d := "stroka" + d;
+    writeln("\nResult:");
     writeln(b);
     writeln(d);
 end.

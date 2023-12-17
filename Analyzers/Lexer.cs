@@ -29,6 +29,7 @@ namespace Compiler.Analyzers
 			{
 				case "writeln": type = Function_type.WRITELN; return true;
 				case "readln": type = Function_type.READLN; return true;
+				case "math": type = Function_type.MATH; return true;
 				default: return false;
 			} 
 			

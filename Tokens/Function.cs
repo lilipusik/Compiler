@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Compiler
 {
-	enum Function_type { READLN, WRITELN };
+	enum Function_type { READLN, WRITELN, MATH };
 	class Function : Token
 	{
 		private Function_type func_type;

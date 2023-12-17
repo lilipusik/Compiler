@@ -85,14 +85,14 @@ token: FUNCTION (WRITELN) -> (7, 5)
 lexeme: (
 token: KEYWORD (LPAR) -> (7, 12)
 
-lexeme: "Write a = "
+lexeme: "Write a:"
 token: CONST (STRING) -> (7, 13)
 
 lexeme: )
-token: KEYWORD (RPAR) -> (7, 25)
+token: KEYWORD (RPAR) -> (7, 23)
 
 lexeme: ;
-token: KEYWORD (SEMICOLON) -> (7, 26)
+token: KEYWORD (SEMICOLON) -> (7, 24)
 
 lexeme: readln
 token: FUNCTION (READLN) -> (8, 5)
@@ -145,57 +145,102 @@ token: KEYWORD (RPAR) -> (9, 26)
 lexeme: ;
 token: KEYWORD (SEMICOLON) -> (9, 27)
 
+lexeme: writeln
+token: FUNCTION (WRITELN) -> (10, 5)
+
+lexeme: (
+token: KEYWORD (LPAR) -> (10, 12)
+
+lexeme: "Write d:"
+token: CONST (STRING) -> (10, 13)
+
+lexeme: )
+token: KEYWORD (RPAR) -> (10, 23)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (10, 24)
+
+lexeme: readln
+token: FUNCTION (READLN) -> (11, 5)
+
+lexeme: (
+token: KEYWORD (LPAR) -> (11, 11)
+
 lexeme: d
-token: IDENTIFIER -> (10, 5)
+token: IDENTIFIER -> (11, 12)
+
+lexeme: )
+token: KEYWORD (RPAR) -> (11, 13)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (11, 14)
+
+lexeme: d
+token: IDENTIFIER -> (12, 5)
 
 lexeme: :=
-token: KEYWORD (ASSIGN) -> (10, 7)
+token: KEYWORD (ASSIGN) -> (12, 7)
 
 lexeme: "stroka"
-token: CONST (STRING) -> (10, 10)
+token: CONST (STRING) -> (12, 10)
 
 lexeme: +
-token: KEYWORD (PLUS) -> (10, 19)
-
-lexeme: "str2"
-token: CONST (STRING) -> (10, 21)
-
-lexeme: ;
-token: KEYWORD (SEMICOLON) -> (10, 27)
-
-lexeme: writeln
-token: FUNCTION (WRITELN) -> (11, 5)
-
-lexeme: (
-token: KEYWORD (LPAR) -> (11, 12)
-
-lexeme: b
-token: IDENTIFIER -> (11, 13)
-
-lexeme: )
-token: KEYWORD (RPAR) -> (11, 14)
-
-lexeme: ;
-token: KEYWORD (SEMICOLON) -> (11, 15)
-
-lexeme: writeln
-token: FUNCTION (WRITELN) -> (12, 5)
-
-lexeme: (
-token: KEYWORD (LPAR) -> (12, 12)
+token: KEYWORD (PLUS) -> (12, 19)
 
 lexeme: d
-token: IDENTIFIER -> (12, 13)
-
-lexeme: )
-token: KEYWORD (RPAR) -> (12, 14)
+token: IDENTIFIER -> (12, 21)
 
 lexeme: ;
-token: KEYWORD (SEMICOLON) -> (12, 15)
+token: KEYWORD (SEMICOLON) -> (12, 22)
+
+lexeme: writeln
+token: FUNCTION (WRITELN) -> (13, 5)
+
+lexeme: (
+token: KEYWORD (LPAR) -> (13, 12)
+
+lexeme: "\nResult:"
+token: CONST (STRING) -> (13, 13)
+
+lexeme: )
+token: KEYWORD (RPAR) -> (13, 24)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (13, 25)
+
+lexeme: writeln
+token: FUNCTION (WRITELN) -> (14, 5)
+
+lexeme: (
+token: KEYWORD (LPAR) -> (14, 12)
+
+lexeme: b
+token: IDENTIFIER -> (14, 13)
+
+lexeme: )
+token: KEYWORD (RPAR) -> (14, 14)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (14, 15)
+
+lexeme: writeln
+token: FUNCTION (WRITELN) -> (15, 5)
+
+lexeme: (
+token: KEYWORD (LPAR) -> (15, 12)
+
+lexeme: d
+token: IDENTIFIER -> (15, 13)
+
+lexeme: )
+token: KEYWORD (RPAR) -> (15, 14)
+
+lexeme: ;
+token: KEYWORD (SEMICOLON) -> (15, 15)
 
 lexeme: end
-token: KEYWORD (END) -> (13, 1)
+token: KEYWORD (END) -> (16, 1)
 
 lexeme: .
-token: KEYWORD (POINT) -> (13, 4)
+token: KEYWORD (POINT) -> (16, 4)
 

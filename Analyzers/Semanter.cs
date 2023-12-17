@@ -47,7 +47,7 @@ namespace Compiler
 
 		public static void New_Assignment<T>(string name, T value)
 		{
-			if (!variables_type.ContainsKey(name))
+			if (!variables_value.ContainsKey(name))
 				variables_value.Add(name, value.ToString());
 			else Update_Assignment(name, value);
 		}

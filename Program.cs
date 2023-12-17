@@ -16,17 +16,17 @@ namespace Compiler
 	{
 		static void Main(string[] args)
 		{
-			string folders_path = @"C:\Users\Юлия\source\repos\Compiler\tests";
+			string folders_path	 = @"C:\Users\Юлия\source\repos\Compiler\tests";
 
 			string pascal_folder = folders_path + @"\pascal_codes";
 			string outtxt_folder = folders_path + @"\output txts";
-			string css_folder = folders_path + @"\css";
-			string exes_folder = folders_path + @"\exes";
+			string css_folder	 = folders_path + @"\css";
+			string exes_folder	 = folders_path + @"\exes";
 
-			string pascal_path = pascal_folder + @"\Pascal_code.txt";
-			string output_path = outtxt_folder + @"\Compiler_Work.txt";
-			string exe_path = exes_folder + @"\My_compiler.exe";
-			string csharp_path = css_folder + @"\Csharp_code.cs";
+			string pascal_path	 = pascal_folder + @"\Pascal_code.txt";
+			string output_path	 = outtxt_folder + @"\Compiler_Work.txt";
+			string exe_path		 = exes_folder	 + @"\My_compiler.exe";
+			string csharp_path	 = css_folder	 + @"\Csharp_code.cs";
 
 			Generator.Create_Folder(new List<string>() { pascal_folder, outtxt_folder, css_folder, exes_folder });
 
@@ -47,22 +47,28 @@ namespace Compiler
 
 				Generator.Translate_Pascal_To_CSharp();
 
-				Console.WriteLine("Creating cs file...");
+				Console.WriteLine("\nCreating cs file...");
 				File.WriteAllLines(csharp_path, new[] { Generator.CSharp_code });
 
-				Console.WriteLine("Compiling...");
+				Console.WriteLine("\nCompiling...");
 				CSharpCodeProvider provider = new CSharpCodeProvider();
 				
-				provider.CompileAssemblyFromSource(new CompilerParameters(new string[0], exe_path) { GenerateExecutable = true }, Generator.CSharp_code);
-
+				CompilerResults results = provider.CompileAssemblyFromSource(new CompilerParameters(new string[0], exe_path) { GenerateExecutable = true }, Generator.CSharp_code);
+				if (results.Errors.Count > 0) throw new Exception("Error in the created cs file!");
+				
+				Console.ForegroundColor = ConsoleColor.Green;
 				Console.WriteLine("\nDone!");
-				Thread.Sleep(2000);
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.Message);
-				Thread.Sleep(2000);
-				return;
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("\n" + ex.Message);
+			}
+			finally
+			{
+				Console.ForegroundColor = ConsoleColor.Cyan;
+				Console.WriteLine("\nPress any key");
+				Console.ReadKey();
 			}
 		}
 	}

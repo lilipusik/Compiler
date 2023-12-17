@@ -212,9 +212,9 @@ namespace Compiler
 
 		private void Expression(string lex, bool flag)
 		{
-			if (Accept(KeyWords.ASSIGN))
+			if (Accept(KeyWords.ASSIGN) || Accept(Token_type.CONST) || Accept(Token_type.IDENTIFIER))
 			{
-				Next_Token();
+				if (Accept(KeyWords.ASSIGN)) Next_Token();
 				expression += lexeme;
 				if (Accept(Token_type.IDENTIFIER))
 				{
@@ -253,34 +253,19 @@ namespace Compiler
 				else
 				{
 					Next_Token();
-					if (type == Function_type.READLN)
+					if (type == Function_type.READLN) 
 					{
-						expression = Console.ReadLine();
-						Const_type const_ = Semanter.Type_Variable(lexeme);
-						switch (const_)
-						{
-							case Const_type.INTEGER:
-								if (!int.TryParse(expression, out _))
-									Print_Error("Data entry error", "Semantic error");
-								break;
-							case Const_type.FLOAT:
-								double p;
-								if (!double.TryParse(expression, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out p))
-									Print_Error("Data entry error", "Semantic error");
-								else expression = p.ToString();
-								break;
-						}
-						Semanter.New_Assignment(lexeme, expression);
-						Generator.Add_Code(type, lexeme, const_);
+						if (!Semanter.Has_Variable(lexeme)) Print_Error("Not found variable definition", "Syntax error");
+						else Generator.Add_Readline(lexeme, Semanter.Type_Variable(lexeme));
+
+						Next_Token();
 					}
-					else
+					else if (type == Function_type.WRITELN)
 					{
-						Generator generator = new Generator(lexeme);
-						generator.Expression_Calculator();
-						if (Generator.Result == "error") Print_Error("Calculation error", "Semantic error");
-						else if (Generator.Result != string.Empty) Generator.Writeline();
+						Expression(lexeme, true);
+						Generator.Add_Writeline(expression);
 					}
-					Next_Token();
+
 					if (!Accept(KeyWords.RPAR)) Print_Error("Not found closing bracket after function", "Syntax error");
 					Next_Token();
 					if (!Accept(KeyWords.SEMICOLON)) Print_Error("Not found semicolon after function", "Syntax error");
@@ -292,7 +277,7 @@ namespace Compiler
 				if (!Semanter.Has_Variable(lex)) Print_Error("Not found variable definition", "Syntax error");
 				Next_Token();
 				Expression(lex, false);
-				Semanter.New_Assignment(lex, expression);
+				Generator.Add_Expression(lex, expression);
 				return true;
 			}
 			else if (Accept(KeyWords.IF))
